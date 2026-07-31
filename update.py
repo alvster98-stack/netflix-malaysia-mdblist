@@ -96,6 +96,25 @@ def main():
 
             catalog.append(item)
 
+
+    stremio_catalog = {
+        "metas": []
+    }
+
+
+    for item in catalog:
+
+        stremio_catalog["metas"].append({
+
+            "id": f"{item['type']}:{item['tmdb_id']}",
+
+            "type": item["type"],
+
+            "name": item["title"]
+
+        })
+
+
     with open(
         "netflix-malaysia.json",
         "w",
@@ -103,11 +122,12 @@ def main():
     ) as file:
 
         json.dump(
-            catalog,
+            stremio_catalog,
             file,
             indent=2,
             ensure_ascii=False
         )
+
 
     print(
         "Created catalog:",
