@@ -1,11 +1,35 @@
 import os
 import requests
 from bs4 import BeautifulSoup
-
+MDBLIST_KEY = os.environ["MDBLIST_API_KEY"]
+MDBLIST_LIST = "alvster98/netflix-malaysia"
 TMDB_KEY = os.environ["TMDB_API_KEY"]
 
 titles = []
+def add_to_mdblist(item):
 
+    url = "https://api.mdblist.com/items/add"
+
+    data = {
+        "items": [
+            {
+                "tmdb_id": item["id"],
+                "media_type": item["type"]
+            }
+        ],
+        "list": MDBLIST_LIST
+    }
+
+    r = requests.post(
+        url,
+        headers={
+            "Authorization": f"Bearer {MDBLIST_KEY}",
+            "Content-Type": "application/json"
+        },
+        json=data
+    )
+
+    print(r.status_code, r.text)
 
 def scrape():
 
@@ -71,12 +95,17 @@ def main():
         result = tmdb_search(title)
 
         if result:
+
             print(
                 title,
                 "→",
                 result
             )
+
+            add_to_mdblist(result)
+
         else:
+
             print(
                 "No match:",
                 title
