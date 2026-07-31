@@ -104,11 +104,56 @@ def main():
             catalog.append(item)
 
 
-    # Create Nuvio/Stremio style catalog
-
     stremio_catalog = {
         "metas": []
     }
 
 
-    for
+    for item in catalog:
+
+        stremio_catalog["metas"].append(
+            {
+                "id": f"{item['type']}:{item['tmdb_id']}",
+                "type": item["type"],
+                "name": item["title"]
+            }
+        )
+
+
+    with open(
+        "netflix-malaysia.json",
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            stremio_catalog,
+            file,
+            indent=2,
+            ensure_ascii=False
+        )
+
+
+    with open(
+        "catalog.json",
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            stremio_catalog,
+            file,
+            indent=2,
+            ensure_ascii=False
+        )
+
+
+    print(
+        "Created catalog:",
+        len(catalog),
+        "titles"
+    )
+
+
+if __name__ == "__main__":
+    main()
