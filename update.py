@@ -90,7 +90,10 @@ def main():
 
     titles = get_netflix_titles()
 
-    print("Found titles:", len(titles))
+    print(
+        "Found titles:",
+        len(titles)
+    )
 
 
     catalog = []
@@ -98,20 +101,30 @@ def main():
 
     for title in titles:
 
-        print("Searching:", title)
+        print(
+            "Searching:",
+            title
+        )
 
         item = find_tmdb(title)
 
 
         if item:
 
-            print("Added:", item)
+            print(
+                "Added:",
+                item
+            )
 
             catalog.append(item)
 
+
         else:
 
-            print("No match:", title)
+            print(
+                "No match:",
+                title
+            )
 
 
 
@@ -124,10 +137,11 @@ def main():
     }
 
 
+
     for item in catalog:
 
         meta = {
-            "id": f"tmdb:{item['tmdb_id']}",
+            "id": str(item["tmdb_id"]),
             "type": item["type"],
             "name": item["title"]
         }
@@ -196,6 +210,7 @@ def main():
         "SERIES:",
         len(series["metas"])
     )
+
 
 
 if __name__ == "__main__":
