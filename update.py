@@ -65,7 +65,6 @@ def find_tmdb(title):
     data = response.json()
 
     if "results" not in data:
-        print("TMDB error:", data)
         return None
 
 
@@ -91,10 +90,7 @@ def main():
 
     titles = get_netflix_titles()
 
-    print(
-        "Found titles:",
-        len(titles)
-    )
+    print("Found titles:", len(titles))
 
 
     catalog = []
@@ -102,69 +98,89 @@ def main():
 
     for title in titles:
 
-        print(
-            "Searching:",
-            title
-        )
+        print("Searching:", title)
 
         item = find_tmdb(title)
 
 
         if item:
 
-            print(
-                "Added:",
-                item
-            )
+            print("Added:", item)
 
             catalog.append(item)
 
         else:
 
-            print(
-                "No match:",
-                title
-            )
+            print("No match:", title)
 
 
-    output = {
+
+    movies = {
+        "metas": []
+    }
+
+    series = {
         "metas": []
     }
 
 
     for item in catalog:
 
-        output["metas"].append(
-            {
-                "id": f"tmdb:{item['tmdb_id']}",
-                "type": item["type"],
-                "name": item["title"]
-            }
-        )
+        meta = {
+            "id": f"tmdb:{item['tmdb_id']}",
+            "type": item["type"],
+            "name": item["title"]
+        }
+
+
+        if item["type"] == "movie":
+
+            movies["metas"].append(meta)
+
+
+        elif item["type"] == "tv":
+
+            meta["type"] = "series"
+
+            series["metas"].append(meta)
+
+
+
+    os.makedirs(
+        "catalog/movie",
+        exist_ok=True
+    )
+
+    os.makedirs(
+        "catalog/series",
+        exist_ok=True
+    )
+
 
 
     with open(
-        "catalog.json",
+        "catalog/movie/netflix-malaysia.json",
         "w",
         encoding="utf-8"
     ) as file:
 
         json.dump(
-            output,
+            movies,
             file,
             indent=2,
             ensure_ascii=False
         )
 
 
+
     with open(
-        "netflix-malaysia.json",
+        "catalog/series/netflix-malaysia.json",
         "w",
         encoding="utf-8"
     ) as file:
 
         json.dump(
-            output,
+            series,
             file,
             indent=2,
             ensure_ascii=False
@@ -172,11 +188,14 @@ def main():
 
 
     print(
-        "FINAL:",
-        len(output["metas"]),
-        "titles created"
+        "MOVIES:",
+        len(movies["metas"])
     )
 
+    print(
+        "SERIES:",
+        len(series["metas"])
+    )
 
 
 if __name__ == "__main__":
