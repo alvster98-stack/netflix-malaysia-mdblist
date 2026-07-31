@@ -92,7 +92,7 @@ def add_to_mdblist(item):
     }
 
     headers = {
-        "Authorization": f"Bearer {MDBLIST_KEY}",
+        "apikey": MDBLIST_KEY,
         "Content-Type": "application/json"
     }
 
