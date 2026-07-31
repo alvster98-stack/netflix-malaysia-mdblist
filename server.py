@@ -1,27 +1,29 @@
-from flask import Flask, jsonify
-import json
+from flask import Flask, jsonify, send_file
 
 app = Flask(__name__)
 
 
 @app.route("/manifest.json")
 def manifest():
-    with open("manifest.json") as f:
-        return jsonify(json.load(f))
+    return send_file("manifest.json")
 
 
-@app.route("/catalog/<type>/<id>.json")
-def catalog(type, id):
+@app.route("/catalog/movie/netflix-malaysia.json")
+def movie_catalog():
+    return send_file(
+        "catalog/movie/netflix-malaysia.json"
+    )
 
-    if type == "movie":
-        file = "catalog/movie/netflix-malaysia.json"
 
-    else:
-        file = "catalog/series/netflix-malaysia.json"
-
-    with open(file) as f:
-        return jsonify(json.load(f))
+@app.route("/catalog/series/netflix-malaysia.json")
+def series_catalog():
+    return send_file(
+        "catalog/series/netflix-malaysia.json"
+    )
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(
+        host="0.0.0.0",
+        port=10000
+    )
