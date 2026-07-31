@@ -1,21 +1,16 @@
-import os
-import time
 import requests
+import json
 from bs4 import BeautifulSoup
+import os
 
 TMDB_KEY = os.environ["TMDB_API_KEY"]
-MDBLIST_KEY = os.environ["MDBLIST_API_KEY"]
-
-# Keep this for now until we confirm MDBList list endpoint format
-MDBLIST_LIST = "alvster98/netflix-malaysia"
 
 
-def scrape():
+def get_netflix_titles():
 
     url = "https://ottasia.com/whats-new/netflix/malaysia"
 
     response = requests.get(url, timeout=30)
-    response.raise_for_status()
 
     soup = BeautifulSoup(
         response.text,
@@ -26,8 +21,8 @@ def scrape():
         "What's new",
         "Recently added",
         "Netflix in other countries",
-        "other services",
-        "Netflixin other countries"
+        "Netflixin other countries",
+        "other services"
     ]
 
     titles = []
@@ -37,15 +32,15 @@ def scrape():
         title = item.get_text(strip=True)
 
         if title and not any(
-            x.lower() in title.lower()
-            for x in ignore
+            bad.lower() in title.lower()
+            for bad in ignore
         ):
             titles.append(title)
 
     return list(set(titles))
 
 
-def tmdb_search(title):
+def find_tmdb(title):
 
     url = "https://api.themoviedb.org/3/search/multi"
 
@@ -69,78 +64,56 @@ def tmdb_search(title):
         if result.get("media_type") in ["movie", "tv"]:
 
             return {
-                "id": result["id"],
-                "type": result["media_type"],
-                "title": title
+                "title": title,
+                "tmdb_id": result["id"],
+                "type": result["media_type"]
             }
 
     return None
 
 
-def add_to_mdblist(item):
-
-    url = "https://api.mdblist.com/lists/items"
-
-    payload = {
-        "list": MDBLIST_LIST,
-        "items": [
-            {
-                "tmdb_id": item["id"],
-                "media_type": item["type"]
-            }
-        ]
-    }
-
-    headers = {
-        "apikey": MDBLIST_KEY,
-        "Content-Type": "application/json"
-    }
-
-    response = requests.post(
-        url,
-        headers=headers,
-        json=payload,
-        timeout=30
-    )
-
-    print(
-        "MDBList:",
-        item["title"],
-        response.status_code,
-        response.text
-    )
-
-
 def main():
 
-    titles = scrape()
+    titles = get_netflix_titles()
 
     print(
-        "Found titles:",
+        "Found:",
         len(titles)
     )
 
-    for title in titles[:1]:
+    catalog = []
 
-        result = tmdb_search(title)
+    for title in titles:
 
-        if result:
+        item = find_tmdb(title)
 
-            print(
-                "TMDB:",
-                result
-            )
-
-            add_to_mdblist(result)
-
-            time.sleep(2)
-
-        else:
+        if item:
 
             print(
-                "No TMDB match:",
-                title
+                "Added:",
+                item
             )
+
+            catalog.append(item)
+
+    with open(
+        "netflix-malaysia.json",
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            catalog,
+            file,
+            indent=2,
+            ensure_ascii=False
+        )
+
+    print(
+        "Created catalog:",
+        len(catalog),
+        "titles"
+    )
 
 
 if __name__ == "__main__":
