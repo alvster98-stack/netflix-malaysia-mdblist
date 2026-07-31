@@ -1,0 +1,32 @@
+{
+  "id": "com.alvster98.netflixmalaysia",
+  "version": "1.0.0",
+  "name": "Netflix Malaysia",
+  "description": "Auto updated Netflix Malaysia catalog",
+  "resources": [
+    {
+      "name": "catalog",
+      "types": [
+        "movie",
+        "series"
+      ],
+      "id": "netflix-malaysia"
+    }
+  ],
+  "types": [
+    "movie",
+    "series"
+  ],
+  "catalogs": [
+    {
+      "type": "movie",
+      "id": "netflix-malaysia-movies",
+      "name": "Netflix Malaysia Movies"
+    },
+    {
+      "type": "series",
+      "id": "netflix-malaysia-series",
+      "name": "Netflix Malaysia Series"
+    }
+  ]
+}
