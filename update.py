@@ -2,93 +2,93 @@ import os
 import requests
 from bs4 import BeautifulSoup
 
-MDBLIST_API_KEY = os.environ["MDBLIST_API_KEY"]
+API_KEY = os.environ["MDBLIST_API_KEY"]
 
-USERNAME = "alvster98"
-LIST_NAME = "netflix-malaysia"
+LIST_ID = "alvster98/netflix-malaysia"
 
-HEADERS = {
-    "Authorization": f"Bearer {MDBLIST_API_KEY}",
-    "Content-Type": "application/json"
+headers = {
+    "Authorization": f"Bearer {API_KEY}"
 }
 
 
-def get_netflix_malaysia_titles():
+def scrape_titles():
+
     url = "https://ottasia.com/whats-new/netflix/malaysia"
 
-    r = requests.get(url, timeout=30)
-    r.raise_for_status()
+    html = requests.get(url, timeout=30).text
 
-    soup = BeautifulSoup(r.text, "html.parser")
+    soup = BeautifulSoup(html, "html.parser")
 
     titles = []
 
-    for item in soup.select("h3, h2"):
-        title = item.get_text(strip=True)
+    for tag in soup.find_all(["h2", "h3"]):
 
-        if title:
+        title = tag.get_text(strip=True)
+
+        ignore = [
+            "What's new",
+            "Recently added",
+            "Netflix in other countries",
+            "other services"
+        ]
+
+        if title and not any(x in title for x in ignore):
             titles.append(title)
 
     return list(set(titles))
 
 
-def search_mdblist(title):
-    url = "https://api.mdblist.com/search"
+def mdblist_search(title):
 
-    params = {
-        "query": title
-    }
+    url = "https://api.mdblist.com/search"
 
     r = requests.get(
         url,
-        headers=HEADERS,
-        params=params,
-        timeout=30
+        headers=headers,
+        params={"query": title}
     )
 
     if r.status_code != 200:
+        print("Search failed:", title)
         return None
 
-    data = r.json()
+    results = r.json()
 
-    if not data:
+    if not results:
         return None
 
-    item = data[0]
+    item = results[0]
 
-    return {
-        "mediatype": item.get("mediatype"),
-        "id": item.get("imdb_id")
-    }
+    return item.get("imdb_id")
 
 
-def add_to_list(item):
+def add_item(imdb_id):
 
-    url = "https://api.mdblist.com/list/add"
+    url = "https://api.mdblist.com/lists/add"
 
-    payload = {
-        "username": USERNAME,
-        "list": LIST_NAME,
+    data = {
+        "list": LIST_ID,
         "items": [
-            item
+            imdb_id
         ]
     }
 
     r = requests.post(
         url,
-        headers=HEADERS,
-        json=payload
+        headers=headers,
+        json=data
     )
 
-    print(r.text)
+    print(r.status_code, r.text)
 
 
 def main():
 
-    titles = get_netflix_malaysia_titles()
+    titles = scrape_titles()
 
     print(
-        f"Found {len(titles)} Netflix Malaysia titles"
+        "Found:",
+        len(titles)
     )
 
     for title in titles:
@@ -98,10 +98,10 @@ def main():
             title
         )
 
-        item = search_mdblist(title)
+        imdb = mdblist_search(title)
 
-        if item:
-            add_to_list(item)
+        if imdb:
+            add_item(imdb)
 
 
 if __name__ == "__main__":
