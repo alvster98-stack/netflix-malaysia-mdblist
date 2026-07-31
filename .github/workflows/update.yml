@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: write
-  
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -35,6 +35,6 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          git add netflix-malaysia.json
+          git add catalog.json netflix-malaysia.json
           git commit -m "Update Netflix Malaysia catalog" || exit 0
           git push
