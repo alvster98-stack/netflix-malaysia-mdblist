@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 MDBLIST_KEY = os.environ["MDBLIST_API_KEY"]
 MDBLIST_LIST = "alvster98/netflix-malaysia"
 TMDB_KEY = os.environ["TMDB_API_KEY"]
+print("MDBLIST key loaded:", bool(MDBLIST_KEY))
+print("MDBLIST key length:", len(MDBLIST_KEY))
 
 titles = []
 def add_to_mdblist(item):
