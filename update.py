@@ -3,7 +3,12 @@ import json
 from bs4 import BeautifulSoup
 import os
 
-TMDB_KEY = os.environ["TMDB_API_KEY"]
+
+TMDB_KEY = os.environ.get("TMDB_API_KEY")
+
+
+if not TMDB_KEY:
+    raise Exception("TMDB_API_KEY is missing")
 
 
 def get_netflix_titles():
@@ -60,9 +65,12 @@ def find_tmdb(title):
 
     data = response.json()
 
-    if data.get("results"):
+    if "results" not in data:
+        print("TMDB error:", data)
+        return None
 
-        result = data["results"][0]
+
+    for result in data["results"]:
 
         if result.get("media_type") in [
             "movie",
@@ -75,7 +83,9 @@ def find_tmdb(title):
                 "type": result["media_type"]
             }
 
+
     return None
+
 
 
 def main():
@@ -83,9 +93,10 @@ def main():
     titles = get_netflix_titles()
 
     print(
-        "Found:",
+        "Found titles:",
         len(titles)
     )
+
 
     catalog = []
 
@@ -99,6 +110,7 @@ def main():
 
         item = find_tmdb(title)
 
+
         if item:
 
             print(
@@ -111,38 +123,24 @@ def main():
         else:
 
             print(
-                "No TMDB match:",
+                "No match:",
                 title
             )
 
 
-    stremio_catalog = {
+    output = {
         "metas": []
     }
 
 
     for item in catalog:
 
-        stremio_catalog["metas"].append(
+        output["metas"].append(
             {
                 "id": f"{item['type']}:{item['tmdb_id']}",
                 "type": item["type"],
                 "name": item["title"]
             }
-        )
-
-
-    with open(
-        "netflix-malaysia.json",
-        "w",
-        encoding="utf-8"
-    ) as file:
-
-        json.dump(
-            stremio_catalog,
-            file,
-            indent=2,
-            ensure_ascii=False
         )
 
 
@@ -153,7 +151,21 @@ def main():
     ) as file:
 
         json.dump(
-            stremio_catalog,
+            output,
+            file,
+            indent=2,
+            ensure_ascii=False
+        )
+
+
+    with open(
+        "netflix-malaysia.json",
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            output,
             file,
             indent=2,
             ensure_ascii=False
@@ -161,10 +173,11 @@ def main():
 
 
     print(
-        "Created catalog:",
-        len(catalog),
-        "titles"
+        "FINAL:",
+        len(output["metas"]),
+        "titles created"
     )
+
 
 
 if __name__ == "__main__":
