@@ -5,16 +5,21 @@
   "description": "Auto updated Netflix Malaysia catalog",
 
   "resources": [
-    "catalog"
+    {
+      "name": "catalog",
+      "types": [
+        "movie",
+        "series"
+      ],
+      "idPrefixes": [
+        "tmdb:"
+      ]
+    }
   ],
 
   "types": [
     "movie",
     "series"
-  ],
-
-  "idPrefixes": [
-    "tmdb:"
   ],
 
   "catalogs": [
