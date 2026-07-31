@@ -6,7 +6,6 @@ import os
 
 TMDB_KEY = os.environ.get("TMDB_API_KEY")
 
-
 if not TMDB_KEY:
     raise Exception("TMDB_API_KEY is missing")
 
@@ -137,7 +136,7 @@ def main():
 
         output["metas"].append(
             {
-                "id": f"{item['type']}:{item['tmdb_id']}",
+                "id": f"tmdb:{item['tmdb_id']}",
                 "type": item["type"],
                 "name": item["title"]
             }
