@@ -92,6 +92,11 @@ def main():
 
     for title in titles:
 
+        print(
+            "Searching:",
+            title
+        )
+
         item = find_tmdb(title)
 
         if item:
@@ -102,6 +107,13 @@ def main():
             )
 
             catalog.append(item)
+
+        else:
+
+            print(
+                "No TMDB match:",
+                title
+            )
 
 
     stremio_catalog = {
