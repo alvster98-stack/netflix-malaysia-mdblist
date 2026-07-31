@@ -79,7 +79,7 @@ def tmdb_search(title):
 
 def add_to_mdblist(item):
 
-    url = "https://api.mdblist.com/items/add"
+    url = "https://api.mdblist.com/items"
 
     payload = {
         "list": MDBLIST_LIST,
